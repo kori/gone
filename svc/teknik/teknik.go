@@ -31,8 +31,8 @@ func Upload(file string) string {
 	// Write to form
 	fileForm, err := w.CreateFormFile("file", file)
 	check(err)
-
 	io.Copy(fileForm, f)
+	// Close file and writer.
 	f.Close()
 	w.Close()
 
