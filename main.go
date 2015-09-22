@@ -12,8 +12,8 @@ func main() {
 	flag.Parse()
 	var wg sync.WaitGroup
 
-	// t = total files, p = path to file
-	for t, p := range flag.Args() {
+	// p = path to file
+	for _, p := range flag.Args() {
 		wg.Add(1)
 		go func(file string) {
 			defer wg.Done()
