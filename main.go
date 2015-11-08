@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/kori/gone/svc/teknik"
@@ -17,8 +18,12 @@ func main() {
 		wg.Add(1)
 		go func(file string) {
 			defer wg.Done()
-			url := teknik.Upload(p)
-			fmt.Println(url)
+			if _, err := os.Stat(file); err == nil {
+				url := teknik.Upload(p)
+				fmt.Println(url)
+			} else {
+				fmt.Println(file, "doesn't exist")
+			}
 		}(p)
 	}
 	wg.Wait()

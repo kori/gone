@@ -40,8 +40,8 @@ func Upload(file string) string {
 	check(err)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
-	// Set up a Transport with Teknik's TLS version info, and then set up the
-	// HTTP client.
+	// Set up a Transport with Teknik's TLS version info, and then set up
+	// the HTTP client.
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			MinVersion: tls.VersionTLS11,
