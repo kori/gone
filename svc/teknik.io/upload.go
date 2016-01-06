@@ -10,9 +10,9 @@ import (
 	"os"
 )
 
-const apiURL = "https://api.teknik.io/upload/post"
+const uploadAPIURL = "https://api.teknik.io/upload/post"
 
-type response struct {
+type uploadresponse struct {
 	Results struct {
 		File struct {
 			URL string `json:"url"` // The direct URL to the uploaded file.
@@ -36,7 +36,7 @@ func Upload(file string) string {
 	f.Close()
 	w.Close()
 
-	req, err := http.NewRequest("POST", apiURL, &b)
+	req, err := http.NewRequest("POST", uploadAPIURL, &b)
 	check(err)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
@@ -57,16 +57,9 @@ func Upload(file string) string {
 	check(err)
 
 	// Return results after unmarshal.
-	buf := make([]byte, res.ContentLength)
-	io.ReadFull(res.Body, buf)
-	var r []response
-	check(json.Unmarshal(buf, &r))
+	var r []uploadresponse
+	dec := json.NewDecoder(res.Body)
+	dec.Decode(&r)
 
 	return r[0].Results.File.URL
-}
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
 }

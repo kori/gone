@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/kori/gone/svc/teknik"
+	"github.com/kori/gone/svc/teknik.io"
 )
 
 func main() {
