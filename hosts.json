@@ -1,0 +1,23 @@
+{
+	"hosts":[{ 
+			"name":"1339.cf",
+			"uploadurl":"http://1339.cf/upload.php",
+			"returnurl":"http://b.1339.cf/" 
+		},{ 
+			"name":"maxfile.ro",
+			"uploadurl":"https://maxfile.ro/static/upload.php",
+			"returnurl":"https://d.maxfile.ro/"
+		},{ 
+			"name":"pomf.cat",
+			"uploadurl":"http://pomf.cat/upload.php",
+			"returnurl":"http://a.pomf.cat/" 
+		},{ 
+			"name":"mixtape.moe", 
+			"uploadurl":"https://mixtape.moe/upload.php",    
+			"returnurl":"https://my.mixtape.moe/"
+		},{
+			"name":"pomf.is",
+			"uploadurl":"https://pomf.is/upload.php",
+			"returnurl":"https://u.pomf.is/"
+	}]
+}

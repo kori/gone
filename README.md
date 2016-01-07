@@ -5,7 +5,7 @@ gone is a concurrent file uploader that supports multiple services.
 
 `go get github.com/kori/gone`
 
-Add the binary to your $PATH.
+Install `hosts.json` to `$XDG_CONFIG_DIR`
 
 # misc:
 Credits to [nyanpasu](https://github.com/nyanpasu) for the original upload
