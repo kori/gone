@@ -14,10 +14,10 @@
 		},{ 
 			"name":"mixtape.moe", 
 			"uploadurl":"https://mixtape.moe/upload.php",    
-			"returnurl":"https://my.mixtape.moe/"
+			"returnurl":""
 		},{
 			"name":"pomf.is",
 			"uploadurl":"https://pomf.is/upload.php",
-			"returnurl":"https://u.pomf.is/"
+			"returnurl":""
 	}]
 }
