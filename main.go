@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -24,17 +25,19 @@ var (
 // Structs for dealing with unmarshalling the hosts.json file.
 // hosts.json contains the information for the hosts.
 
-type hosts struct {
-	host []struct {
-		Name      string
-		UploadURL string
-		ReturnURL string
-	}
+type Host struct {
+	Name      string `json:"name"`
+	UploadURL string `json:"uploadurl"`
+	ReturnURL string `json:"returnurl"`
+}
+
+type Hosts struct {
+	Host []Host `json:"hosts"`
 }
 
 // Struct to unmarshal the response from the server.
 type teknikResponse struct {
-	Results struct {
+	Result struct {
 		URL string
 	}
 }
@@ -47,17 +50,17 @@ type pomfResponse struct {
 }
 
 // getHost returns a host with its relevant info.
-func getHost() (hosts.host, error) {
+func getHost() (*Host, error) {
 	// Read hosts list
 	path := os.Getenv("XDG_CONFIG_HOME") + "/gone/hosts.json"
 	hostfile, err := ioutil.ReadFile(path)
 	check(err)
 
 	// Unmarshal hosts list and get the upload URL
-	var hs hosts
+	var hs Hosts
 	json.Unmarshal(hostfile, &hs)
 	check(err)
-	for _, h := range hs.host {
+	for _, h := range hs.Host {
 		if h.Name == *hostname {
 			return &h, nil
 		}
@@ -66,7 +69,7 @@ func getHost() (hosts.host, error) {
 }
 
 // prepareUpload takes a path to a file and returns a request.
-func (host *host) prepareUpload(filepath string) *http.Request {
+func (h *Host) prepareUpload(filepath string) *http.Request {
 	// Read file to be uploaded.
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
@@ -81,27 +84,23 @@ func (host *host) prepareUpload(filepath string) *http.Request {
 	f.Close()
 	w.Close()
 
-	req, err := http.NewRequest("POST", host.UploadURL, &b)
+	req, err := http.NewRequest("POST", h.UploadURL, &b)
 	check(err)
 	req.Header.Set("Content-Type", w.FormDataContentType())
 
 	return req
 }
 
-func (host *host) upload(req *http.Request) string {
+func (h *Host) upload(req *http.Request) string {
 	// Prepare client and call API
-	//	tr := &http.Transport{
-	//			TLSClientConfig: &tls.Config{
-	//				MinVersion: tls.VersionTLS11,
-	//				MaxVersion: tls.VersionTLS11,
-	//			},
-	//		}
-	//		client := &http.Client{
-	//			Transport: tr,
-	//		}
-	//	} else {
-	client := &http.Client{}
-	//	}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				MinVersion: tls.VersionTLS11,
+				MaxVersion: tls.VersionTLS11,
+			},
+		},
+	}
 
 	// Perform request
 	res, err := client.Do(req)
@@ -113,20 +112,20 @@ func (host *host) upload(req *http.Request) string {
 		dec := json.NewDecoder(res.Body)
 		dec.Decode(&r)
 
-		return host.ReturnURL + r.Results.URL
+		return h.ReturnURL + r.Result.URL
 	}
 
 	var r pomfResponse
 	dec := json.NewDecoder(res.Body)
 	dec.Decode(&r)
 
-	return host.ReturnURL + r.Files[0].URL
+	return h.ReturnURL + r.Files[0].URL
 }
 
 func main() {
 	flag.Parse()
 	var wg sync.WaitGroup
-	host, err := getHost()
+	h, err := getHost()
 	check(err)
 
 	if len(flag.Args()) == 0 {
@@ -139,8 +138,8 @@ func main() {
 			go func(file string) {
 				defer wg.Done()
 				if exists(file) {
-					r := host.prepareUpload(file)
-					fmt.Println(host.upload(r))
+					r := h.prepareUpload(file)
+					fmt.Println(h.upload(r))
 				} else {
 					log.Fatal("file doesn't exist: ", file)
 				}
