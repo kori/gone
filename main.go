@@ -35,20 +35,6 @@ type Hosts struct {
 	Host []Host `json:"hosts"`
 }
 
-// Struct to unmarshal the response from the server.
-type teknikResponse struct {
-	Result struct {
-		URL string
-	}
-}
-
-// Struct to unmarshal the response from the server.
-type pomfResponse struct {
-	Files []struct {
-		URL string
-	}
-}
-
 // getHost returns a host with its relevant info.
 func getHost() (*Host, error) {
 	// Read hosts list
@@ -68,8 +54,8 @@ func getHost() (*Host, error) {
 	return nil, errors.New("getHost: host not in list")
 }
 
-// prepareUpload takes a path to a file and returns a request.
-func (h *Host) prepareUpload(filepath string) *http.Request {
+// prepareRequest takes a path to a file and returns a request.
+func (h *Host) prepareRequest(filepath string) *http.Request {
 	// Read file to be uploaded.
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
@@ -101,25 +87,20 @@ func (h *Host) upload(req *http.Request) string {
 			},
 		},
 	}
-
-	// Perform request
+	// Unmarshal and return response.
 	res, err := client.Do(req)
 	check(err)
 
-	// Unmarshal and return response.
-	if *hostname == "teknik" {
-		var r teknikResponse
-		dec := json.NewDecoder(res.Body)
-		dec.Decode(&r)
-
-		return h.ReturnURL + r.Result.URL
+	var r struct {
+		Result struct {
+			URL string
+		}
 	}
 
-	var r pomfResponse
 	dec := json.NewDecoder(res.Body)
 	dec.Decode(&r)
 
-	return h.ReturnURL + r.Files[0].URL
+	return h.ReturnURL + r.Result.URL
 }
 
 func main() {
@@ -138,7 +119,7 @@ func main() {
 			go func(file string) {
 				defer wg.Done()
 				if exists(file) {
-					r := h.prepareUpload(file)
+					r := h.prepareRequest(file)
 					fmt.Println(h.upload(r))
 				} else {
 					log.Fatal("file doesn't exist: ", file)
