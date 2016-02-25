@@ -19,5 +19,9 @@
 			"name":"pomf.is",
 			"uploadurl":"https://pomf.is/upload.php",
 			"returnurl":""
+		},{
+			"name":"teknik.io",
+			"uploadurl":"https://api.teknik.io/v1/Upload",
+			"returnurl":""
 	}]
 }
