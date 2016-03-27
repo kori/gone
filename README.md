@@ -1,3 +1,6 @@
+NOTE: dead
+Use https://github.com/DanielFGray/dotfiles/tree/master/local/bin/tekup
+
 # gone
 gone is a concurrent file uploader that supports multiple services.
 
