@@ -12,19 +12,25 @@ import (
 
 func Upload(filepath string) (string, error) {
 	// Read file to be uploaded.
+	file, err := os.Open(filepath)
+	if err != nil {
+		return "", err
+	}
+
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
-	f, err := os.Open(filepath)
+
+	fi, err := os.Stat(filepath)
 	if err != nil {
 		return "", err
 	}
 
 	// Write to form
-	fileForm, err := w.CreateFormFile("file", filepath)
+	form, err := w.CreateFormFile("file", fi.Name())
 	if err != nil {
 		return "", err
 	}
-	if _, err := io.Copy(fileForm, f); err != nil {
+	if _, err := io.Copy(form, f); err != nil {
 		return "", err
 	}
 	// Close file and writer.
